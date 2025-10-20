@@ -16,7 +16,7 @@ def predix_multiomics_prepare_data(treatment):
     sim_imp = SimpleImputer(strategy='most_frequent')
     encoder = OneHotEncoder(handle_unknown='error', sparse_output=False)
 
-    main_path = os.getcwd() + '/'#'/home/gman/PREDIX_MULTIOMICS_ML/'
+    main_path = os.getcwd() + '/'
     ########################################################################################################################
     data = pd.read_csv(main_path + 'clin_multiomics_curated_metrics_PREDIX_HER2.txt',sep='\t')
     data.dropna(subset=['pCR'], inplace=True)
@@ -47,7 +47,6 @@ def predix_multiomics_prepare_data(treatment):
         tmp = tmp.replace({'Clin_ANYNODES': mapping})
     #-----------------------------------------------------------------------------------------------------------------------
 
-    #ena mikro faul edw
     Clin_TUMSIZE = sim_imp.fit_transform(tmp['Clin_TUMSIZE'].to_frame())
 
 
@@ -61,7 +60,6 @@ def predix_multiomics_prepare_data(treatment):
     tmp = tmp.drop('Clin_TUMSIZE', axis=1)
     #-----------------------------------------------------------------------------------------------------------------------
 
-    #ena mikro faul edw
     RNA_sspbc_subtype = sim_imp.fit_transform(tmp['RNA_sspbc.subtype'].to_frame())
 
     fit_RNA_sspbc_subtype = sim_imp.fit(tmp['RNA_sspbc.subtype'].to_frame())
@@ -93,7 +91,6 @@ def predix_multiomics_prepare_data(treatment):
     frames = [tmp, Clin_TUMSIZE, RNA_sspbc_subtype]
     tmp = pd.concat(frames, axis=1)
 
-    #### SOS na ginoun ordinal!!!
 
     #--------------------------------------------------------------
     #get categorical variables and encode them
@@ -113,8 +110,6 @@ def predix_multiomics_prepare_data(treatment):
     #remove patients having missing data
     data = data[data.isnull().sum(axis=1) < round(0.025*len(data.columns))]
 
-    xxx3 = data.isnull().sum(axis = 0)
-
     data.columns = data.columns.str.replace('<=', "less_equal_", regex=True).values
     data.columns = data.columns.str.replace('>', "higher_", regex=True).values
     data.columns = data.columns.str.replace('<', "lower_", regex=True).values
@@ -122,11 +117,6 @@ def predix_multiomics_prepare_data(treatment):
 
     data = data.reset_index(drop=True)
 
-    #missing_value_df = pd.DataFrame({'column_name': data.columns,'percent_missing': percent_missing})
-    #missing_value_df.to_csv('missing_values_after.csv')
-    #--------------------------------------------------------------
-    #selector = MissingValueThreshold(0.1)
-    #data = selector.fit_transform(data)
     ##########################################################################################################################################################################
     ##########################################################################################################################################################################
     ##########################################################################################################################################################################
