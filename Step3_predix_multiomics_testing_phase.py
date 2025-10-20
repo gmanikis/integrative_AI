@@ -1,8 +1,6 @@
 from pandas import read_pickle
 from sklearn.model_selection import train_test_split
 
-#tidyverse gia fair
-
 import joblib
 from joblib import Parallel, delayed
 from sklearn.metrics import RocCurveDisplay
@@ -246,23 +244,6 @@ class PandasSimpleImputer(SimpleImputer):
         return pd.DataFrame(super().transform(X), columns=self.columns)
 
 
-
-
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-#gm = MetricFrame(metrics=accuracy_score, y_true=y, y_pred=y_pred, sensitive_features=sex)
-#print(gm.overall)
-#print(gm.by_group)
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
@@ -324,54 +305,6 @@ def read_pickle(filename):
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-#https://www.kaggle.com/code/remilpm/how-to-remove-multicollinearity
-#Mult_Coll = ReduceVIF()
-#Data3 = Mult_Coll.fit_transform(Data2)
-
-class ReduceVIF(BaseEstimator, TransformerMixin):
-    def __init__(self, thresh=10, impute=True, impute_strategy='median'):
-        # From looking at documentation, values between 5 and 10 are "okay".
-        # Above 10 is too high and so should be removed.
-        self.thresh = thresh
-
-        # The statsmodel function will fail with NaN values, as such we have to impute them.
-        # By default we impute using the median value.
-        # This imputation could be taken out and added as part of an sklearn Pipeline.
-        if impute:
-            self.imputer = SimpleImputer(strategy='median')#PandasSimpleImputer()###########Imputer(strategy=impute_strategy)
-
-    def fit(self, X, y=None):
-        print('ReduceVIF fit')
-        if hasattr(self, 'imputer'):
-            self.imputer.fit(X)
-        return self
-
-    def transform(self, X, y=None):
-        print('ReduceVIF transform')
-        columns = X.columns.tolist()
-        if hasattr(self, 'imputer'):
-            X = pd.DataFrame(self.imputer.transform(X), columns=columns)
-        return ReduceVIF.calculate_vif(X, self.thresh)
-
-    @staticmethod
-    def calculate_vif(X, thresh=5.0):
-        # Taken from https://stats.stackexchange.com/a/253620/53565 and modified
-        dropped = True
-        while dropped:
-            variables = X.columns
-            dropped = False
-            vif = [variance_inflation_factor(X[variables].values, X.columns.get_loc(var)) for var in X.columns]
-
-            max_vif = max(vif)
-            if max_vif > thresh:
-                maxloc = vif.index(max_vif)
-                #################################################print(f'Dropping {X.columns[maxloc]} with vif={max_vif}')
-                X = X.drop([X.columns.tolist()[maxloc]], axis=1)
-                dropped = True
-        return X
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
 
 def evaluate_model(model, X_test, y_test):
     """
@@ -427,30 +360,6 @@ class PandasFromArray(BaseEstimator, TransformerMixin):
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-#exoume ta eksis options gia ta parakatw:
-#1) arfs: apo to antistoixo paketo. travaei ta 4 modela apo models
-#2) bruta: travaei to diko tou pipeline. travaei ta 4 modela apo models
-#3) simple: allazei to function pou epistrefei ta important feature names. travaei apo to simple_models
-#4) simple_models_with_panda: o feature selector thelei numpy kai oxi df opote metasxhmatizw. Meta ta gurnaw se df sta importances
-#5) simple_models_with_panda_y_numpy: idio me 4 alla thelei to y_train na einai to_numpy()!!!
-
-####################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
-
-####################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
-####################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
@@ -714,22 +623,6 @@ def permutation_train_after_selection_PARALLEL(train_from_vect, skf, model_name 
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-
-######################   arguments to run a single step ################################################################
-out = new_list3_test.index('boruta__CatBoost__XGB')
-train_from_vect = new_list1_test[out]
-test_from_vect = new_list2_test[out]
-model_name = new_list3_test[out]
-selected_features = new_list4_test[out]
-input_pipe_set = new_list5_test[out]
-#num_of_feats = new_list6_test[out]
-vect_for_fair_input = new_list7_test[out]
-file_to_write  = new_list8_test[out]
-pipeline_scaling = new_list9_test[out]
-data_for_fair_ml = new_list10_test[out]
-train_test_indices = new_list11_test[out]
-
 def permutation_phase_PARALLEL(train_from_vect , test_from_vect , model_name  ,  selected_features, input_pipe_set , vect_for_fair_input, file_to_write, pipeline_scaling, data_for_fair_ml, train_test_indices, percent_cutoff, treatment ):
 
     methods_to_check = ('rusboost__', 'adacost__', 'catboost__', 'selfpace__', 'asymboost__', 'compada__')
@@ -865,40 +758,6 @@ def permutation_phase_PARALLEL(train_from_vect , test_from_vect , model_name  , 
             #tmp['Pvalue'] = pvalue
             print('DONE:----------' + tmp_name + '-------------')
 
-#             ix_training, ix_test = [], []
-#             # Loop through each fold and append the training & test indices to the empty lists above
-#             for fold in cv_permute.split(train_selected, y_train):
-#                 ix_training.append(fold[0]), ix_test.append(fold[1])
-#
-#             SHAP_values_per_fold = []  # -#-#
-#             ## Loop through each outer fold and extract SHAP values
-#             for i, (train_outer_ix, test_outer_ix) in enumerate(zip(ix_training, ix_test)):  # -#-#
-#                 # Verbose
-#                 print('\n------ Fold Number:', i)
-#                 X_train_, X_test_ = train_selected.iloc[train_outer_ix, :], train_selected.iloc[test_outer_ix, :]
-#                 y_train_, y_test_ = y_train.iloc[train_outer_ix], y_train.iloc[test_outer_ix]
-#
-# #----------------------------------------------
-#                 ######na prougithei transform
-#                 model = pipe_set.named_steps['model']
-#                 model.fit(X_train_, y_train_)
-#                 # shap.initjs()
-#                 ex = shap.KernelExplainer(model.predict, X_test_.values)
-#                 shap_values = ex.shap_values(X_test_.values)
-#                 shap.summary_plot(shap_values, X_test_)
-#    #--------------------------------
-#
-#
-#                 fit = pipe_set.fit(X_train_, y_train_)
-#                 yhat = fit.predict(X_test)
-#                 result = mean_squared_error(y_test, yhat)
-#                 print('RMSE:', round(np.sqrt(result), 4))
-#
-#                 # Use SHAP to explain predictions
-#                 explainer = shap.TreeExplainer(model)
-#                 shap_values = explainer.shap_values(X_test)
-#                 for SHAPs in shap_values:
-#                     SHAP_values_per_fold.append(SHAPs)  # -#-#
             #######################################################################################################################
             #######################################################################################################################
             #######################################################################################################################
@@ -922,17 +781,11 @@ def permutation_phase_PARALLEL(train_from_vect , test_from_vect , model_name  , 
 
     tmp_all_results = pd.concat(tmp_all_results)
     return  tmp_all_results , feats_to_run_.values, roc_data_all, num_of_feats
-# https://towardsdatascience.com/feature-selection-with-boruta-in-python-676e3877e596
-
-#https://medium.com/geekculture/boruta-feature-selection-explained-in-python-7ae8bf4aa1e7
-
-#https://forum.numer.ai/t/feature-selection-with-borutashap/4145/5
 
 ####################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-#file_to_write = main_path_pkl  + 'Testing_' + case_to_run
 
 def plot_roc_curves( train_test_indices, data_for_permut, y_permut, pipe_set, file_to_write, model_name, pipeline_scaling, methods_to_check  ):
     tprs = []
@@ -1037,24 +890,6 @@ def plot_roc_curves( train_test_indices, data_for_permut, y_permut, pipe_set, fi
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
-selection_type = 'all'    # all: simple + arfs + boruta
-select_modalities = 'RNA'
-pipeline_scaling_ = 'no_norm'
-num_of_feats = 10
-treatment = '0'
-vect_for_fair_input = 'Clin_Arm'
-main_path_pkl = os.getcwd() + '/'#
-percent_cutoff = 75  #  -1 when no cutoff to be applied
-
 def my_main_funct(selection_type , treatment, pipeline_scaling_, num_of_feats, select_modalities, main_path_pkl, percent_cutoff):
     num_of_feats = int(num_of_feats)
     print(treatment)
@@ -1337,364 +1172,6 @@ def my_main_funct(selection_type , treatment, pipeline_scaling_, num_of_feats, s
 #if __name__ == '__main__':
 #    my_main_funct(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
     # main_path_pkl =    '/home/gman/PycharmProjects/SklearnML/'#'/mimer/NOBACKUP/groups/foukakis_ai/manikis/Python/hande_ml/latest_kang_paper/'
-
-
-
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-from sklearn.metrics import classification_report
-from sklearn.metrics import PrecisionRecallDisplay
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-
-
-
-def calculate_metrics(actual, predicted):
-    """
-    Calculate sensitivity, specificity, TPR, and FPR from actual and predicted outcomes.
-
-    Parameters:
-    actual (list): List of actual binary outcomes (0 or 1)
-    predicted (list): List of predicted binary outcomes (0 or 1)
-
-    Returns:
-    dict: Dictionary containing sensitivity, specificity, TPR, and FPR
-    """
-    if len(actual) != len(predicted):
-        raise ValueError("Actual and predicted lists must have the same length")
-
-    # Initialize counters
-    TP = TN = FP = FN = 0
-
-    # Count true positives, true negatives, false positives, false negatives
-    for a, p in zip(actual, predicted):
-        if a == 1 and p == 1:
-            TP += 1
-        elif a == 0 and p == 0:
-            TN += 1
-        elif a == 0 and p == 1:
-            FP += 1
-        elif a == 1 and p == 0:
-            FN += 1
-
-    # Calculate metrics
-    sensitivity = TP / (TP + FN) if (TP + FN) > 0 else 0.0  # Same as TPR
-    specificity = TN / (TN + FP) if (TN + FP) > 0 else 0.0
-    TPR = sensitivity  # True Positive Rate is same as sensitivity
-    FPR = FP / (FP + TN) if (FP + TN) > 0 else 0.0  # False Positive Rate
-
-    return {
-        'sensitivity': sensitivity,
-        'specificity': specificity,
-        'TPR': TPR,
-        'FPR': FPR
-    }
-
-
-def Find_Optimal_Cutoff(target, predicted):
-    """ Find the optimal probability cutoff point for a classification model related to event rate
-    Parameters
-    ----------
-    target : Matrix with dependent or target data, where rows are observations
-
-    predicted : Matrix with predicted data, where rows are observations
-
-    Returns
-    -------
-    list type, with optimal cutoff value
-
-    """
-    fpr, tpr, threshold = roc_curve(target, predicted)
-    i = np.arange(len(tpr))
-    roc = pd.DataFrame({'tf': pd.Series(tpr - (1 - fpr), index=i), 'threshold': pd.Series(threshold, index=i)})
-    roc_t = roc.iloc[(roc.tf - 0).abs().argsort()[:1]]
-
-    return list(roc_t['threshold'])
-
-
-# Print confusion Matrix
-from sklearn.metrics import confusion_matrix
-
-
-
-#roc_curves_ = pd.DataFrame(xxx1[2][0][0] , xxx1[2][0][1])
-#roc_curves_.to_csv('RNA.csv')
-
-#from fairlearn.metrics import MetricFrame, selection_rate, accuracy_score_group_min
-#from sklearn.metrics import accuracy_score
-
-#metric_frame = MetricFrame(
-#    metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},
-#    y_true=y_test,
-#    y_pred=y_pred,
-#    sensitive_features=sex_test
-#)
-
-#test_full_data = read_pickle('/home/gman/PREDIX_MULTIOMICS_ML/model_results/Testing_all_no_norm_selfeats_3_simple.pkl')#
-#xxx3 = return_overall_test_performance(test_full_data)
-
-
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-selection_type = 'all'    # all: simple + arfs + boruta
-select_modalities = 'RNA'
-pipeline_scaling_ = 'no_norm'
-num_of_feats = 10
-treatment = '0'
-pipe_write = pipeline_scaling_
-case_is = 'boruta__XGB__BalancedRandForest' # 'arfs__XGB__LogisticRegressionElastic'   #arfs__CatBoost__BalancedRandForest for treat1
-percent_cutoff = 75
-methods_to_check = ('rusboost__', 'adacost__', 'catboost__', 'selfpace__', 'asymboost__', 'compada__')
-main_path_pkl = '/home/gman/PREDIX_MULTIOMICS_ML/'
-
-if treatment == '1' or treatment == '0':
-    analysis_case = selection_type + '_' + pipe_write + '_TREAT_' + str(treatment)
-    test_full_data = read_pickle('/home/gman/PREDIX_MULTIOMICS_ML/Testing_all_' + pipeline_scaling_ + '_TREAT_' + str(treatment) + '_selfeats_' + str(num_of_feats) + '_' + select_modalities + '.pkl')
-    train_on_test_full_data = read_pickle('/home/gman/PREDIX_MULTIOMICS_ML/Training_at_Testing_all_' + pipeline_scaling_ + '_TREAT_' + str(treatment) + '_selfeats_' + str(num_of_feats) +  '_' + select_modalities + '.pkl')
-else:
-    analysis_case = selection_type + '_' + pipe_write
-    test_full_data = read_pickle('/home/gman/PREDIX_MULTIOMICS_ML/Testing_all_' + pipeline_scaling_ + '_selfeats_' + str(num_of_feats) +  '_' + select_modalities + '.pkl')
-    train_on_test_full_data = read_pickle('/home/gman/PREDIX_MULTIOMICS_ML/Training_at_Testing_all_' + pipeline_scaling_ + '_selfeats_'+ str(num_of_feats) +  '_' + select_modalities + '.pkl')
-
-
-case_to_run = analysis_case + '_selfeats_' + str(num_of_feats)+ '_' + select_modalities
-print(case_to_run)
-
-xxx_test_test = return_overall_test_performance(test_full_data)
-xxx_test_train = return_overall_test_performance(train_on_test_full_data)
-
-
-model_feat_ranking = read_pickle(main_path_pkl + 'Model_Feats_Ranking_' + case_to_run + '.pkl')
-model_names_df = read_pickle(main_path_pkl + 'Model_Names_' + case_to_run + '.pkl')
-model_pipelines = read_pickle(main_path_pkl + 'Model_Pipelines_' + case_to_run + '.pkl')
-model_train_vect = read_pickle(main_path_pkl + 'model_train_vect.pkl')
-external_test_vect = read_pickle(main_path_pkl + 'external_test_vect.pkl')
-
-test_indices = read_pickle(main_path_pkl + 'test_indices.pkl')
-train_indices = read_pickle(main_path_pkl + 'train_indices.pkl')
-all_indices = [train_indices, test_indices]
-
-###################################################################################################################
-###################################################################################################################
-###################################################################################################################
-# -----------------------------------------------------------------------------------------------------------------------
-########### filter by treatment!!!!!!! and update indexing!!!!!!!
-if treatment == '1' or treatment == '0':
-    print('TREATMENT SELECTED')
-    for i in range(len(external_test_vect)):
-        external_test_vect[i] = external_test_vect[i][(external_test_vect[i]['Clin_Arm'] == int(treatment))]
-        model_train_vect[i] = model_train_vect[i][(model_train_vect[i]['Clin_Arm'] == int(treatment))]
-        test_indices[i] = external_test_vect[i].index.values
-        train_indices[i] = model_train_vect[i].index.values
-
-    tmp_merged_data_to_fix_index = pd.concat([model_train_vect[0], external_test_vect[0]])
-    tmp_merged_data_to_fix_index = pd.DataFrame(data = tmp_merged_data_to_fix_index.index.values)
-
-    for iii in range(len(external_test_vect)):
-        idx_list = [i for i, row in enumerate(tmp_merged_data_to_fix_index.to_numpy()) if row in test_indices[iii] ]
-        test_indices[iii] = idx_list
-        idx_list = [i for i, row in enumerate(tmp_merged_data_to_fix_index.to_numpy()) if row in train_indices[iii]]
-        train_indices[iii] = idx_list
-    # -----------------------------------------------------------------------------------------------------------------------
-    ###################################################################################################################
-    ###################################################################################################################
-    ###################################################################################################################
-
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------RESULTS AT TESTING PHASE   ---------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-out = model_names_df.index(case_is)
-input_pipe_set = model_pipelines[out]
-selected_features = model_feat_ranking[out]
-#num_of_feats = np.percentile(selected_features['hybrid_ranks_'], 90)
-#num_of_feats = sum(selected_features['hybrid_ranks_']>num_of_feats)
-
-if percent_cutoff < 0:
-    num_of_feats = model_train_vect[0].shape[1]
-else:
-    num_of_feats = np.percentile(selected_features['hybrid_ranks_'], percent_cutoff)
-    num_of_feats = sum(selected_features['hybrid_ranks_'] > num_of_feats)
-
-    if num_of_feats > np.round((model_train_vect[0].shape[0] + external_test_vect[0].shape[0]) / 10):
-        num_of_feats = np.round((model_train_vect[0].shape[0] + external_test_vect[0].shape[0]) / 10)
-        num_of_feats = num_of_feats.astype(int)
-
-
-print( 'feats: ' + str(num_of_feats) )
-feats_to_run_ = selected_features['feat_name'].iloc[0:num_of_feats]
-
-#selected_features.iloc[0:num_of_feats]
-pipe_set = input_pipe_set
-if not case_is.startswith(methods_to_check):
-    ############################  remove the feature selection
-    idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'arfs'][0]
-    pipe_set.steps.pop(idx)
-
-############################  remove the COLLINEARITY
-idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'collinear'][0]
-pipe_set.steps.pop(idx)
-
-############################  remove the UniqueValuesThreshold
-idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'unique'][0]
-pipe_set.steps.pop(idx)
-
-#-------------------------------------------------------------------------------------------------------------------------
-y_permut = pd.concat([model_train_vect[0]['pCR'], external_test_vect[0]['pCR']], axis=0)
-data_for_permut = pd.concat([model_train_vect[0][feats_to_run_], external_test_vect[0][feats_to_run_]], axis=0)
-#-------------------------------------------------------------------------------------------------------------------------
-file_to_write = '/home/gman/PREDIX_MULTIOMICS_ML/tmp/'
-roc_data = plot_roc_curves(all_indices, data_for_permut, y_permut, pipe_set, file_to_write, case_is,pipeline_scaling_, methods_to_check)
-
-x_axis = roc_data[0]
-y_axis = roc_data[1]
-
-roc_values = pd.DataFrame( {'x_axis': x_axis, 'y_axis': y_axis} )
-roc_values.to_csv(file_to_write + case_to_run + '_ROC_values.csv')
-
-selected_features.to_csv(file_to_write + case_to_run + '_Feature_weights.csv')
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-#----------------------------------------------------------------------------------------------------------------------------------
-
-
-
-#--------------- for the external case
-total_score = []
-for case_is in model_names_df:
-    try:
-        out = model_names_df.index(case_is)
-
-        input_pipe_set = model_pipelines[out]
-
-        selected_features = model_feat_ranking[out]
-
-        out = model_names_df.index(case_is)
-        input_pipe_set = model_pipelines[out]
-        selected_features = model_feat_ranking[out]
-        # num_of_feats = np.percentile(selected_features['hybrid_ranks_'], 90)
-        # num_of_feats = sum(selected_features['hybrid_ranks_']>num_of_feats)
-
-        if percent_cutoff < 0:
-            num_of_feats = model_train_vect[0].shape[1]
-        else:
-            num_of_feats = np.percentile(selected_features['hybrid_ranks_'], percent_cutoff)
-            num_of_feats = sum(selected_features['hybrid_ranks_'] > num_of_feats)
-
-            if num_of_feats > np.round((model_train_vect[0].shape[0] + external_test_vect[0].shape[0]) / 10):
-                num_of_feats = np.round((model_train_vect[0].shape[0] + external_test_vect[0].shape[0]) / 10)
-                num_of_feats = num_of_feats.astype(int)
-
-        print('feats: ' + str(num_of_feats))
-        feats_to_run_ = selected_features['feat_name'].iloc[0:num_of_feats]
-
-        external_test = read_pickle(main_path_pkl + 'RNA_external_validation_fixed_Treat' + str(treatment) +  '.pkl')
-        y_external = external_test['pCR']
-        external_test = external_test[feats_to_run_]
-        #-------------------------------------------------------------------------------------------------------------------------
-        y_permut = pd.concat([model_train_vect[0]['pCR'], external_test_vect[0]['pCR']], axis=0)
-        data_for_permut = pd.concat([model_train_vect[0][feats_to_run_], external_test_vect[0][feats_to_run_]], axis=0)
-        #-------------------------------------------------------------------------------------------------------------------------
-
-        pipe_set = input_pipe_set
-        if not case_is.startswith(methods_to_check):
-            ############################  remove the feature selection
-            idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'arfs' ][0]
-            pipe_set.steps.pop(idx)
-
-        ############################  remove the COLLINEARITY
-        idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'collinear' ][0]
-        pipe_set.steps.pop(idx)
-
-        ############################  remove the UniqueValuesThreshold
-        idx = [idx for idx, name in enumerate(pipe_set.named_steps.keys()) if name == 'unique' ][0]
-        pipe_set.steps.pop(idx)
-
-        pipe_set.fit(data_for_permut,y_permut)
-        ext_results = pipe_set.predict_proba(external_test)
-        ext_results_crisp = pipe_set.predict(external_test)
-
-        xxx = calculate_metrics(y_external, ext_results_crisp)
-        print('------------------------------------------------------------------------------------------------------')
-        print(xxx)
-        y_pred = pipe_set.predict_proba(external_test)[:, 1]
-        y_pred_crisp = pipe_set.predict(external_test)
-        # Find optimal probability threshold
-        #threshold = Find_Optimal_Cutoff(y_external, y_pred)
-        #print
-        #threshold
-        # [0.31762762459360921]
-
-        #roc_curve2_ = RocCurveDisplay.from_predictions(y_external , y_pred)
-        roc_curve_ = RocCurveDisplay.from_estimator(pipe_set,external_test, y_external, response_method='predict_proba',plot_chance_level= False)
-        pr_curve_ = PrecisionRecallDisplay.from_estimator(pipe_set,external_test, y_external, plot_chance_level=True)
-        print(case_is + ':___' +  str(roc_curve_.roc_auc))
-        xxx['AUC'] = roc_curve_.roc_auc
-        xxx['classifier'] = case_is
-        false_positive_rate, true_positive_rate, thresholds = roc_curve(y_external, y_pred)
-        roc_auc_score(y_external, y_pred)
-        total_score.append(xxx)
-    except:
-        print(case_is)
-
-
-xxx2 = pd.DataFrame(total_score)
-
-
-roc_values = pd.DataFrame( {'x_axis': roc_curve_.fpr, 'y_axis': roc_curve_.tpr} )
-roc_values.to_csv(file_to_write + case_to_run + '_ROC_values_RNA_EXTERNAL_TREAT_0.csv')
-
-
-plt.close("all") #this is the line to be added
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-
-# used inputs from the docs (Visualizations with Display Objects)
-
-roc_curve_.plot(ax=ax1) # RocCurveDisplay's plot
-pr_curve_.plot(ax=ax2,plot_chance_level=True) # the other plots (eventually)
-
-# to save an image for example
-plt.savefig(main_path_pkl + 'display_object_skl.png', dpi=300, bbox_inches="tight")
-
-plt.show()
-
-
-# external Treatment 1 : boruta__CatBoost__BalancedRandForest:___0.6909855769230769
-
-
-
-fig, ax = plt.subplots(figsize=[8,6])
-
-# set plot title
-ax.set_title("Some title")
-
-# set x-axis name
-ax.set_xlabel("X-Label")
-
-# set y-axis name
-ax.set_ylabel("Y-Label")
-
-# create histogram within output
-N, bins, patches = ax.hist(selected_features['hybrid_ranks_'], bins=50, color="#777777") #initial color of all bins
-
-plt.show()
-
-
 
 
 
