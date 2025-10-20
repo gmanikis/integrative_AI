@@ -1,7 +1,4 @@
 from sklearn.model_selection import train_test_split
-
-#tidyverse gia fair
-
 import joblib
 from joblib import Parallel, delayed
 
@@ -206,12 +203,6 @@ from fairlearn.metrics import demographic_parity_ratio, count, false_positive_ra
 ###############################################################################################from boruta import BorutaPy
 
 import inspect
-##############os.system("taskset -p 0xff %d" % os.getpid())
-
-
-#############pip install -U statsmodels   +  https://www.statsmodels.org/stable/_modules/statsmodels/stats/power.html
-
-
 
 def unpanda(df):
     if not isinstance(df, np.ndarray):
@@ -252,14 +243,6 @@ class PandasSimpleImputer(SimpleImputer):
 
 
 
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
 
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
@@ -326,9 +309,6 @@ def read_pickle(filename):
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-#https://www.kaggle.com/code/remilpm/how-to-remove-multicollinearity
-#Mult_Coll = ReduceVIF()
-#Data3 = Mult_Coll.fit_transform(Data2)
 
 class ReduceVIF(BaseEstimator, TransformerMixin):
     def __init__(self, thresh=10, impute=True, impute_strategy='median'):
@@ -429,15 +409,6 @@ class PandasFromArray(BaseEstimator, TransformerMixin):
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-#exoume ta eksis options gia ta parakatw:
-#1) arfs: apo to antistoixo paketo. travaei ta 4 modela apo models
-#2) bruta: travaei to diko tou pipeline. travaei ta 4 modela apo models
-#3) simple: allazei to function pou epistrefei ta important feature names. travaei apo to simple_models
-#4) simple_models_with_panda: o feature selector thelei numpy kai oxi df opote metasxhmatizw. Meta ta gurnaw se df sta importances
-#5) simple_models_with_panda_y_numpy: idio me 4 alla thelei to y_train na einai to_numpy()!!!
-
-
 def set_pipeline(feat_selector,model_internal, selection_category , use_scaling, perc, n_estimators, max_iter):
 
     coll_thres = 0.8
@@ -706,13 +677,6 @@ def set_pipeline(feat_selector,model_internal, selection_category , use_scaling,
 
 def return_fairness(fair_ytest, fair_ypred, fair_metrics_fold, fair_metrics):
 
-    #my_metrics = {'tpr': recall_score,'fpr': false_positive_rate,'sel': selection_rate,'count': count}
-    #acc_frame = MetricFrame(
-    #    metrics=my_metrics,
-    #    y_true=fair_ytest,
-    #    y_pred=fair_ypred,
-    #    sensitive_features=fair_metrics_fold[fair_metrics])
-
     equal_odds_ratio = equalized_odds_ratio(fair_ytest,fair_ypred,sensitive_features=fair_metrics_fold[fair_metrics])  #The ideal value for this metric is 1, which indicates that the true
                                                                                                     #and false positive rates for different groups are equal
 
@@ -723,11 +687,6 @@ def return_fairness(fair_ytest, fair_ypred, fair_metrics_fold, fair_metrics):
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-#selection_category = 'arfs'   'boruta'  'simple'
-#return_feature_importance(pipe_set, train, y_train, skf, num_thres, comb_step[2][0], comb_step[1][0])
-#selection_category = comb_step[2][0]
-#model_name = comb_step[1][0]
 
 def return_feature_importance(pipe_set, train, y_train, skf, num_thres, selection_category, model_name, data_for_fair_ml):
     ####selection_category   --> arfs / boruta / simple / simplepd / simplepdnu
@@ -962,19 +921,6 @@ custom_scoring = {'acc': 'accuracy',
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-#iii=1
-#evaluate training
-#pkl_from_train = aaa
-#comb_step = combinations[iii]
-#fair_metrics= vect_for_fair
-#data_for_fair_ml = new_list7[iii]
-
-#comb_step, n_estimators , max_iter , perc , num_thres, pipeline_scaling, skf, data_for_fair_ml
-
 def GMAN_FEAT_SEL_PARALLEL( comb_step, n_estimators , max_iter , perc , num_thres, pipeline_scaling, skf, data_for_fair_ml):
 
     tmp_all_results = []
@@ -1024,11 +970,6 @@ def GMAN_FEAT_SEL_PARALLEL( comb_step, n_estimators , max_iter , perc , num_thre
         else:
             print('PROBLEMMMMMMM')
 
-        #PycharmProjects / gmanradiomics / lib / python3
-        #.10 / site - packages / imbalanced_ensemble / ensemble / under_samplingPycharmProjects/gmanradiomics/lib/python3.10/site-packages/imbalanced_ensemble/ensemble/under_sampling
-
-
-        ##########  SOS to data_for_fair_ml PREPEI na einai apo to train set mono!!!!!
         data_for_fair_ml = data_for_fair_ml[data_for_fair_ml['patient_id'].isin(train['patient_id'])]
         train = train.drop('patient_id', axis=1)
         data_for_fair_ml = data_for_fair_ml.drop('patient_id', axis=1)
@@ -1132,36 +1073,6 @@ def return_overall_train_performance(pkl_from_train) :
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
 ##########################################################################################################################################################################
-
-# https://towardsdatascience.com/feature-selection-with-boruta-in-python-676e3877e596
-
-#https://medium.com/geekculture/boruta-feature-selection-explained-in-python-7ae8bf4aa1e7
-
-#https://forum.numer.ai/t/feature-selection-with-borutashap/4145/5
-
-####################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-##########################################################################################################################################################################
-#selection_type = 'simple'  #simple, boura, arfs, all
-#treatment = 1   # 0  1   or nan
-#pipeline_scaling = False
-#mimer/NOBACKUP/groups/foukakis_ai/manikis/Python/hande_ml/fusion/curated_metrics/clin_multiomics_curated_metrics_PREDIX_HER2.txt
-#num_thres = 10
-#select_modalities :
-#run1 : Clin + DNA
-#run2 : clin +DNA +RNA
-#run3 : clin+DNA+RNA+prot
-#run4 : clin+DNA+RNA+prot + image
-
-selection_type = 'all'
-treatment = '1'
-pipeline_scaling_ = 'no_norm'
-num_thres = 10
-select_modalities = 'run4'
-path_train_test = '/home/gman/PREDIX_MULTIOMICS_ML/'
-path_to_write = path_train_test + '/model_results/'#'/home/gman/MAMA-MIA/model_results'
-vect_for_fair_input = 'Clin_Arm'#####, 'Clin_Arm']#['er', 'pr', 'tumor_subtype']
 
 def my_main_funct(selection_type , treatment, pipeline_scaling_, num_thres, select_modalities, path_train_test):
     num_thres = int(num_thres)
@@ -1486,13 +1397,3 @@ def my_main_funct(selection_type , treatment, pipeline_scaling_, num_thres, sele
 
 if __name__ == '__main__':
     my_main_funct(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
-
-#statistical tests compare multiple models --> https://www.nature.com/articles/s41598-024-56706-x   --> Friedman’s test
-
-#https://pypi.org/project/MLcps/  ---> 1 metric from multiple
-
-######## see train results
-#train_full_data = read_pickle('/home/gman/MAMA-MIA/model_results/all_no_norm_selfeats_10_run4.pkl')
-#xxx2 = return_overall_train_performance(train_full_data)
-
-#train_info_simple = return_overall_train_performance(aaa_all)
